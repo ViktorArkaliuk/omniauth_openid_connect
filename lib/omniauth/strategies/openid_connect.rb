@@ -122,17 +122,15 @@ module OmniAuth
       def callback_phase
         error = params['error_reason'] || params['error']
         error_description = params['error_description'] || params['error_reason']
-        invalid_state = (options.require_state && params['state'] != stored_state)
+        invalid_state =
+          if options.send_state
+            (options.require_state && params['state'].to_s.empty?) || params['state'] != stored_state
+          else
+            false
+          end
 
-        # Ensure we raise a proper error message
-        if error
-          raise CallbackError, error: params['error'], reason: error_description, uri: params['error_uri']
-        end
-
-        # If state is invalid, raise CSRF error
-        if invalid_state
-          raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter test", uri: request.fullpath
-        end
+        raise CallbackError, error: params['error'], reason: error_description, uri: params['error_uri'] if error
+        raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter" if invalid_state
 
         return unless valid_response_type?
 
@@ -377,7 +375,7 @@ module OmniAuth
       end
 
       def stored_state
-        session.delete('omniauth.state')
+        session['omniauth.state']
       end
 
       def new_nonce
