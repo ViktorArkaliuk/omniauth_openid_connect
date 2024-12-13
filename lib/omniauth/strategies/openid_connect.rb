@@ -386,7 +386,7 @@ module OmniAuth
                     options.state.call
                   end
                 end
-        session['omniauth.state'] = state || SecureRandom.hex(16)
+        session['omniauth.state'] = SecureRandom.hex(16)
       end
 
       def stored_state
