@@ -44,7 +44,7 @@ module OmniAuth
       option :scope, [:openid]
       option :response_type, 'code' # ['code', 'id_token']
       option :send_state, true
-      option :require_state, true
+      option :require_state, false
       option :state
       option :response_mode # [:query, :fragment, :form_post, :web_message]
       option :display, nil # [:page, :popup, :touch, :wap]
