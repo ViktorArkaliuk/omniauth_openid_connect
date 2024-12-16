@@ -131,15 +131,10 @@ module OmniAuth
                         end
 
         # Add the state information to the error description for debugging purposes
-        state_info = {
-          params_state: params['state'],
-          params_state_empty: params['state'].to_s.empty?,
-          stored_state: stored_state
-        }
 
         # Raise errors with detailed information
         if error
-          raise CallbackError, error: params['error'], reason: "#{error_description} | State Info: #{state_info}", uri: params['error_uri']
+          raise CallbackError, error: params['error'], reason: "#{error_description}", uri: params['error_uri']
         end
 
         if invalid_state
@@ -386,7 +381,7 @@ module OmniAuth
                     options.state.call
                   end
                 end
-        session['omniauth.state'] = SecureRandom.hex(16)
+        session['omniauth.state'] = state || SecureRandom.hex(16)
       end
 
       def stored_state
