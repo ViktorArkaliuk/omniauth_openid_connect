@@ -138,7 +138,7 @@ module OmniAuth
         end
 
         if invalid_state
-          raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter. State Info: #{state_info}", uri: request.fullpath
+          raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter.", uri: request.fullpath
         end
 
         return unless valid_response_type?
