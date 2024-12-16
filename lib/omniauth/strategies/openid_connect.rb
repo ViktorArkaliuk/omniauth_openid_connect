@@ -380,7 +380,7 @@ module OmniAuth
       end
 
       def stored_state
-        session['omniauth.state']
+        session.delete('omniauth.state')
       end
 
       def new_nonce
