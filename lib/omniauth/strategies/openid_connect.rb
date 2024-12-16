@@ -122,6 +122,8 @@ module OmniAuth
       def callback_phase
         error = params['error_reason'] || params['error']
         error_description = params['error_description'] || params['error_reason']
+        Rails.logger.info "Params state: #{params['state']}"
+        Rails.logger.info "Session state stored: #{session['omniauth.state']}"
         invalid_state =
           if options.send_state
             (options.require_state && params['state'].to_s.empty?) || params['state'] != stored_state
@@ -366,13 +368,14 @@ module OmniAuth
 
       def new_state
         state = if options.state.respond_to?(:call)
-                  if options.state.arity == 1
-                    options.state.call(env)
-                  else
-                    options.state.call
-                  end
+                  options.state.call(env)
+                else
+                  SecureRandom.hex(16)
                 end
-        session['omniauth.state'] = state || SecureRandom.hex(16)
+        Rails.logger.info "Generated state: #{state}"
+        session['omniauth.state'] = state
+        Rails.logger.info "Session state stored: #{session['omniauth.state']}"
+        state
       end
 
       def stored_state
