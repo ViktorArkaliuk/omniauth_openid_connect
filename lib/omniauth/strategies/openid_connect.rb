@@ -122,24 +122,15 @@ module OmniAuth
       def callback_phase
         error = params['error_reason'] || params['error']
         error_description = params['error_description'] || params['error_reason']
+        invalid_state =
+          if options.send_state
+            (options.require_state && params['state'].to_s.empty?) || params['state'] != stored_state
+          else
+            false
+          end
 
-        # Capture the values of state and stored_state for debugging
-        invalid_state = if options.send_state
-                          (options.require_state && params['state'].to_s.empty?) || params['state'] != stored_state
-                        else
-                          false
-                        end
-
-        # Add the state information to the error description for debugging purposes
-
-        # Raise errors with detailed information
-        if error
-          raise CallbackError, error: params['error'], reason: "#{error_description}", uri: params['error_uri']
-        end
-
-        if invalid_state
-          raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter.", uri: request.fullpath
-        end
+        raise CallbackError, error: params['error'], reason: error_description, uri: params['error_uri'] if error
+        raise CallbackError, error: :csrf_detected, reason: "Invalid 'state' parameter" if invalid_state
 
         return unless valid_response_type?
 
