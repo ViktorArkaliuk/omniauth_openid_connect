@@ -140,10 +140,11 @@ module OmniAuth
 
         verify_id_token!(params['id_token']) if configured_response_type == 'id_token'
         discover!
+        Rails.logger.info "Redirect uri: #{redirect_uri}"
         client.redirect_uri = redirect_uri
 
         return id_token_callback_phase if configured_response_type == 'id_token'
-
+        Rails.logger.info "Authorization Code: #{authorization_code}"
         client.authorization_code = authorization_code
         access_token
         super
