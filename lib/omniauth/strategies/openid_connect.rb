@@ -390,7 +390,7 @@ module OmniAuth
       end
 
       def stored_nonce
-        session['omniauth.nonce']
+        session.delete('omniauth.nonce')
       end
 
       def script_name
