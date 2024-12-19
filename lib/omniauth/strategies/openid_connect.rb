@@ -137,6 +137,7 @@ module OmniAuth
         return unless valid_response_type?
 
         options.issuer = issuer if options.issuer.nil? || options.issuer.empty?
+        Rails.logger.info "Options issuer: #{options.issuer}"
 
         verify_id_token!(params['id_token']) if configured_response_type == 'id_token'
         discover!
@@ -145,6 +146,7 @@ module OmniAuth
 
         return id_token_callback_phase if configured_response_type == 'id_token'
         Rails.logger.info "Authorization Code: #{authorization_code}"
+        Rails.logger.info "Access token: #{access_token}"
         client.authorization_code = authorization_code
         access_token
         super
@@ -284,7 +286,7 @@ module OmniAuth
           client_auth_method: options.client_auth_method,
         }
 
-        token_request_params[:code_verifier] = params['code_verifier'] || session.delete('omniauth.pkce.verifier') if options.pkce
+        token_request_params[:code_verifier] = params['code_verifier'] || session['omniauth.pkce.verifier'] if options.pkce
 
         @access_token = client.access_token!(token_request_params)
         verify_id_token!(@access_token.id_token) if configured_response_type == 'code'
@@ -388,7 +390,7 @@ module OmniAuth
       end
 
       def stored_nonce
-        session.delete('omniauth.nonce')
+        session['omniauth.nonce']
       end
 
       def script_name
