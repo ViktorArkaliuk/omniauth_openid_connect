@@ -146,7 +146,6 @@ module OmniAuth
 
         return id_token_callback_phase if configured_response_type == 'id_token'
         Rails.logger.info "Authorization Code: #{authorization_code}"
-        Rails.logger.info "Access token: #{access_token}"
         client.authorization_code = authorization_code
         access_token
         super
@@ -289,8 +288,8 @@ module OmniAuth
         token_request_params[:code_verifier] = params['code_verifier'] || session.delete('omniauth.pkce.verifier') if options.pkce
 
         @access_token = client.access_token!(token_request_params)
+        Rails.logger.info "Access token: #{@access_token}"
         verify_id_token!(@access_token.id_token) if configured_response_type == 'code'
-
         @access_token
       end
 
